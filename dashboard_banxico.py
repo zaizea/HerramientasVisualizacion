@@ -257,22 +257,20 @@ with abajo_izq:
     st.pyplot(fig)
 
 with abajo_der:
-    st.subheader("Promedio por mes y año")
-    calor = principal.pivot_table(index="Anio", columns="Mes",
-                                  values="Valor", aggfunc="mean")
+    st.subheader("Qué tan común es un brinco fuerte")
+    variacion = porAnio["Variacion"]   # variación diaria (%), ya calculada arriba
+    brincos = int((variacion.abs() > 2).sum())
+    pct = brincos / len(variacion) * 100
 
     fig, ax = plt.subplots(figsize=(6, 3.4))
-    imagen = ax.imshow(calor, cmap="YlGnBu", aspect="auto")
-    fig.colorbar(imagen, ax=ax)
-    ax.set_xticks(range(len(calor.columns)))
-    ax.set_xticklabels(["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul",
-                        "Ago", "Sep", "Oct", "Nov", "Dic"][:len(calor.columns)])
-    ax.set_yticks(range(len(calor.index)))
-    ax.set_yticklabels(calor.index)
-    ax.grid(False)
+    sns.histplot(variacion, bins=50, color=GRIS, ax=ax)
+    ax.axvline(2, color=ROJO, linestyle="--", linewidth=1)
+    ax.axvline(-2, color=ROJO, linestyle="--", linewidth=1)
+    ax.set_xlabel("Variación diaria (%)")
+    ax.set_ylabel("Número de días")
     st.pyplot(fig)
-    st.caption("Escala secuencial: el valor tiene orden pero no un cero "
-               "con significado, así que no va divergente.")
+    st.caption(f"{brincos} de {len(variacion)} días ({pct:.1f} %) se movieron "
+               "más de 2 %, hacia arriba o hacia abajo.")
 
 
 # ─── Datos ─────────────────────────────────────────────────────────────
